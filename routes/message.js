@@ -2,21 +2,28 @@ const express= require('express');
 const data = require('./data');
 const fs = require('fs');
 
-// const { use } = require('./login');
 
 const router=express.Router();
 
 router.get(`/`,(req, res,next) => {
-    res.send(`<form action="/" onsubmit= "document.getElementById('username').value=localStorage.getItem('username')"
+    fs.readFile('message.txt',(err, data) => {
+        if(err){
+            console.log(err)
+            data='no chat exist'
+        }
+
+    });
+    res.send(
+        `${data}<form action="/" onsubmit= "document.getElementById('username').value=localStorage.getItem('username')"
     method="POST"><input id="message" name="message" type="text"placeHolder="message"><input type="hidden" name="username" id="username"><button type="submit">send</button></form>`)
    })
 router.post(`/`,(req, res, next) => {
     
-    data.push(`{${req.body.username}:${req.body.message}}`)
+    data.push(`{${req.body.username}:${req.body.message}\n}`)
     console.log(data);
-    //res.send(`<h6>${req.body.username}:${req.body.message}</h6>`)
+    
     console.log(`${req.body.username}:${req.body.message}`);
-    fs.writeFile("message.txt", `${req.body.username}:${req.body.message}`, (err) => {
+    fs.writeFile("message.txt", `${req.body.username}:${req.body.message}`,{flag:'a'}, (err) => {
         if (err) {
           console.log('Error writing to file:', err);
         } else {
@@ -27,6 +34,6 @@ router.post(`/`,(req, res, next) => {
     
     
 })
-//localStorage.getItem(`username`)
+
 
 module.exports = router
